@@ -1,6 +1,7 @@
 //Creator: Me
 //Created: 4/18/2022
-//Last Updated: 5/2/2022 9:08 PM
+//Last Updated: 5/2/2022 3:00 AM
+//Worked on: Multiply function. 
 //Description: Large Int Uses a doubly linked list to store numbers that are too large for
 //primitive data types for primitive data types and uses them to perform arithmetic operations.
 #ifndef LargeInt_H
@@ -348,6 +349,50 @@ class LargeInt
     LargeInt* multiply(const LargeInt<T>& L1, const LargeInt<T>& L2)
     {
       LargeInt<T>* ret = new LargeInt<T>();
+      ret->getList().AddFront(0);
+      LargeInt<T>* temp = new LargeInt<T>();
+      LinkedList<T> List1; LinkedList<T> List2;
+      LinkedList<int>::Iterator i1; LinkedList<int>::Iterator i2;
+      int sum = 0; int carry = 0;
+      if (Listchecker(L1, L2) == 1)
+      {
+        List1 = L1.getList();
+        List2 = L2.getList();
+      }
+      else
+      {
+        List1 = L2.getList();
+        List2 = L1.getList();
+      }
+      i1 = List1.lastnode();
+      i2 = List2.lastnode();
+      //1500*92
+      //List1 = 1500 
+      //List2 = 92
+      //                  List2.getLength()
+      for (int i = 0; i < 2; i++)
+      {
+        for (int k = 0; k < i - 1; k++)
+        {
+          temp->getList().AddBack(0);
+        }
+        //                  List1.getLength()
+        for (int j = 0; j < 4; j++)
+        {
+          sum += ((*i2) * (*i1)) + carry;
+          carry = sum / 10;
+          temp->getList().AddFront(sum % 10);
+          --i1;
+        }
+        if (carry > 0)
+        {
+          temp->getList().AddFront(carry);
+          carry = 0;
+        }
+        ret = add(*ret, *temp);
+        --i2;
+        i1 = List1.lastnode();
+      }
       return ret;
     }
     const LargeInt<T>& operator - (const LargeInt& other)
@@ -362,6 +407,7 @@ class LargeInt
           //sub(positive, positive) 500 - 50 = 450
           if (this->getList().getLength() >= other.getList().getLength())
           {
+            // becomes negative
             ret = subtract(*this, other);
             List = ret->getList();
             negative = true;
@@ -369,6 +415,7 @@ class LargeInt
           }
           else
           {
+            // becomes positive
             ret = subtract(*this, other);
             List = ret->getList();
             negative = false;
@@ -420,7 +467,73 @@ class LargeInt
         }
       }
     }
-    const LargeInt<T>& operator + (const LargeInt& other);
+    const LargeInt<T>& operator + (const LargeInt& other)
+    {
+      LargeInt<T>* ret = new LargeInt<T>();
+      // this object is not negative.
+      if (this->getNegative() == false)
+      {
+        // 1+1 always positive.
+        if (other.negative == false)
+        {
+          ret = add(*this, other);
+          List = ret->getList();
+          negative = false;
+          return *this;
+        }
+        // 5+-1 = positive.
+        // 1+-5 = negative
+        else
+        {
+          //this > other
+          if (Listchecker(*this, other) == 1)
+          {
+            ret = subtract(*this, other);
+            List = ret->getList();
+            negative = false;
+            return *this;
+          }
+          else
+          {
+            ret = subtract(*this, other);
+            List = ret->getList();
+            negative = true;
+            return *this;
+          }
+        }
+      }
+      // this object is negative.
+      else
+      {
+        // -1+-1 always negative.
+        if (other.negative == true)
+        {
+          ret = add(*this, other);
+          List = ret->getList();
+          negative = true;
+          return *this;
+        }
+        //-5 + 1
+        //-1 + 6 
+        else
+        {
+          if (Listchecker(*this, other) == 1)
+          {
+            ret = subtract(*this, other);
+            List = ret->getList();
+            negative = true;
+            return *this;
+          }
+          else
+          {
+            ret = subtract(*this, other);
+            List = ret->getList();
+            negative = false;
+            return *this;
+          }
+        }
+      }
+    }
     const LargeInt<T>& operator * (const LargeInt&);
     const LargeInt<T>& operator / (const LargeInt&);
     const LargeInt<T>& operator % (const LargeInt&);
