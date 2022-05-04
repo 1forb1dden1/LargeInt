@@ -1,7 +1,7 @@
 //Creator: Me
 //Created: 4/18/2022
-//Last Updated: 5/2/2022 3:00 AM
-//Worked on: Multiply function. 
+//Last Updated: 5/4/2022 10:43 AM 
+//Worked on: overloading the * operator.
 //Description: Large Int Uses a doubly linked list to store numbers that are too large for
 //primitive data types for primitive data types and uses them to perform arithmetic operations.
 #ifndef LargeInt_H
@@ -22,7 +22,7 @@ class LargeInt
     {
       List;
       negative = false;
-    } 
+    }
     LargeInt(LinkedList<T> list, bool TF)
     {
       List = list; negative = TF;
@@ -233,8 +233,10 @@ class LargeInt
       LinkedList<int> List1 = L1.getList();
       LinkedList<int> List2 = L2.getList();
       LinkedList<int> List3;
-      LinkedList<int>::Iterator i1 = List1.lastnode();
-      LinkedList<int>::Iterator i2 = List2.lastnode();
+      LinkedList<int>::Iterator i1;
+      i1 = List1.lastnode();
+      LinkedList<int>::Iterator i2;
+      i2 = List2.lastnode();
       int temp = 0; int carry = 0;
 
       while (i1 != nullptr && i2 != nullptr)
@@ -349,11 +351,13 @@ class LargeInt
     LargeInt* multiply(const LargeInt<T>& L1, const LargeInt<T>& L2)
     {
       LargeInt<T>* ret = new LargeInt<T>();
-      ret->getList().AddFront(0);
       LargeInt<T>* temp = new LargeInt<T>();
-      LinkedList<T> List1; LinkedList<T> List2;
+      LargeInt<T>* temp2 = new LargeInt<T>();
+      LinkedList<T> List1; LinkedList<T> List2; LinkedList<T> List3;
+      LinkedList<T> List4;
+      List1.AddFront(0); temp2->setList(List1);
       LinkedList<int>::Iterator i1; LinkedList<int>::Iterator i2;
-      int sum = 0; int carry = 0;
+      int num1 = 0; int num2 = 0; int sum = 0; int carry = 0;
       if (Listchecker(L1, L2) == 1)
       {
         List1 = L1.getList();
@@ -369,27 +373,31 @@ class LargeInt
       //1500*92
       //List1 = 1500 
       //List2 = 92
-      //                  List2.getLength()
-      for (int i = 0; i < 2; i++)
+      for (int i = 0; i < List2.getLength(); i++)
       {
-        for (int k = 0; k < i - 1; k++)
+        List3 = List4;
+        for (int k = 0; k <= i - 1; k++)
         {
-          temp->getList().AddBack(0);
+          List3.AddBack(0);
         }
-        //                  List1.getLength()
-        for (int j = 0; j < 4; j++)
+        for (int j = 0; j < List1.getLength(); j++)
         {
+          (i1 != nullptr) ? num1 = *i1 : num1 = 0;
+          (i2 != nullptr) ? num2 = *i2 : num2 = 0;
           sum += ((*i2) * (*i1)) + carry;
           carry = sum / 10;
-          temp->getList().AddFront(sum % 10);
+          List3.AddFront(sum % 10);
+          sum = 0;
           --i1;
         }
         if (carry > 0)
         {
-          temp->getList().AddFront(carry);
+          List3.AddFront(carry);
           carry = 0;
         }
-        ret = add(*ret, *temp);
+        temp->setList(List3);
+        ret = add(*temp, *temp2);
+        temp2->setList(ret->getList());
         --i2;
         i1 = List1.lastnode();
       }
@@ -438,32 +446,32 @@ class LargeInt
         {
           // always negative.
           //-50 -50 = -100
-          ret = add(*this, other);
-          List = ret->getList();
-          negative = true;
-          return *this;
+ret = add(*this, other);
+List = ret->getList();
+negative = true;
+return *this;
         }
         else
         {
-          // -100 -- 500 = -100 + 500
-          //if digit of other >= L1 then it is positive.
-          //if digit of other < L1 then it is negative.
-          if (other.getList().getLength() >= this->getList().getLength())
-          {
-            ret = subtract(*this, other);
-            List = ret->getList();
-            negative = false;
-            return *this;
-            //ret.setNegative(false);
-          }
-          else
-          {
-            ret = subtract(*this, other);
-            List = ret->getList();
-            negative = true;
-            return *this;
-            //ret.setNegative(true);
-          }
+        // -100 -- 500 = -100 + 500
+        //if digit of other >= L1 then it is positive.
+        //if digit of other < L1 then it is negative.
+        if (other.getList().getLength() >= this->getList().getLength())
+        {
+          ret = subtract(*this, other);
+          List = ret->getList();
+          negative = false;
+          return *this;
+          //ret.setNegative(false);
+        }
+        else
+        {
+          ret = subtract(*this, other);
+          List = ret->getList();
+          negative = true;
+          return *this;
+          //ret.setNegative(true);
+        }
         }
       }
     }
@@ -534,7 +542,24 @@ class LargeInt
         }
       }
     }
-    const LargeInt<T>& operator * (const LargeInt&);
+    const LargeInt<T>& operator * (const LargeInt& other)
+    {
+      LargeInt<T>* ret = new LargeInt<T>();
+      if (this->getNegative() == other.negative )
+      {
+        ret = multiply(*this, other);
+        List = ret->getList();
+        negative = false;
+        return *this;
+      }
+      else
+      {
+        ret = multiply(*this, other);
+        List = ret->getList();
+        negative = true;
+        return *this;
+      }
+    }
     const LargeInt<T>& operator / (const LargeInt&);
     const LargeInt<T>& operator % (const LargeInt&);
 };
