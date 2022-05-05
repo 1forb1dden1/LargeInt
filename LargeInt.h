@@ -1,7 +1,7 @@
 //Creator: Me
 //Created: 4/18/2022
-//Last Updated: 5/4/2022 10:43 AM 
-//Worked on: overloading the * operator.
+//Last Updated: 5/5/2022 1:04 AM
+//Worked on: Created Division function
 //Description: Large Int Uses a doubly linked list to store numbers that are too large for
 //primitive data types for primitive data types and uses them to perform arithmetic operations.
 #ifndef LargeInt_H
@@ -23,6 +23,11 @@ class LargeInt
       List;
       negative = false;
     }
+    LargeInt(const LargeInt<T>& other)
+    {
+      List = other.List;
+      negative = other.negative;
+    }
     LargeInt(LinkedList<T> list, bool TF)
     {
       List = list; negative = TF;
@@ -31,16 +36,6 @@ class LargeInt
     {
       negative = 0;
       List.~LinkedList();
-    }
-    LargeInt(const LargeInt<T>& other)
-    {
-      // temp points to this object's list.
-      LinkedList<T>* temp = this->getList();
-      // temp2 points to the other object's list.
-      LinkedList<T>* temp2 = other->getList();
-      // temp list copies temp2 list. 
-      temp->copy(temp2);
-      setNegative(other.negative());
     }
     LinkedList<T> getList() const
     {
@@ -298,7 +293,7 @@ class LargeInt
       }
       if (carry > 0)
       {
-        List3.AddBack(carry);
+        List3.AddFront(carry);
       }
       ret->setList(List3);
       return ret;
@@ -330,9 +325,9 @@ class LargeInt
       }
       else
       {
-        //if list 2 is larger than list 1.
-        List1 = L2.getList();
-        List2 = L1.getList();
+      //if list 2 is larger than list 1.
+      List1 = L2.getList();
+      List2 = L1.getList();
       }
       List1 = borrow(List1, List2);
       i1 = List1.lastnode(); i2 = List2.lastnode();
@@ -340,7 +335,7 @@ class LargeInt
       {
         (i1 != NULL) ? num1 = *i1 : num1 = 0;
         (i2 != NULL) ? num2 = *i2 : num2 = 0;
-        List3.AddFront(num1-num2);
+        List3.AddFront(num1 - num2);
         if (i1 != NULL) { --i1; }
         if (i2 != NULL) { --i2; }
       }
@@ -402,6 +397,39 @@ class LargeInt
         i1 = List1.lastnode();
       }
       return ret;
+    }
+    // L1 = Numerator
+    // L2 = Denominator
+    LargeInt* divide(const LargeInt<T>& L1, const LargeInt<T>& L2)
+    {
+      std::cout << "currently dividing numbers...";
+      LargeInt<T>* ret = new LargeInt();
+      LargeInt<T>* temp = new LargeInt();
+      LargeInt<T>* temp2 = new LargeInt<T>();
+      LargeInt<T>* temp3 = new LargeInt<T>();
+      LinkedList<int>::Iterator i1; LinkedList<int>::Iterator i2;
+      LinkedList<T> List1 = L1.getList(); LinkedList<T> List2 = L2.getList();
+      temp->setList(List1); temp2->setList(List2); temp3->setList(List1);
+      List1 = temp->getList();
+      List2 = temp2->getList();
+      i1 = List1.firstnode();
+      i2 = List2.firstnode();
+      int counter = 1;
+      std::cout << "\n";
+      while (Listchecker(*temp, *temp2) == -1)
+      {
+        counter++;
+        temp = add(*temp, *temp3);
+      }
+       List1 = temp->getList();
+       for (auto i1 = List1.firstnode(); i1 != List1.end(); ++i1)
+       {
+         std::cout << *i1 << "";
+       }
+       std::cout << "\n";
+       std::cout << "Counter: " << counter << "\n";
+       std::cout << "counter: " << counter << std::endl;
+       return ret;
     }
     const LargeInt<T>& operator - (const LargeInt& other)
     {
