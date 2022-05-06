@@ -1,7 +1,7 @@
 //Creator: Me
 //Created: 4/18/2022
-//Last Updated: 5/5/2022 9:43 PM
-//Worked on: Created Division function
+//Last Updated: 5/6/2022 1:10 AM
+//Worked on: Overloaded Modulus operator
 //Description: Large Int Uses a doubly linked list to store numbers that are too large for
 //primitive data types for primitive data types and uses them to perform arithmetic operations.
 #ifndef LargeInt_H
@@ -109,7 +109,47 @@ public:
   }
   const LargeInt<T>& operator << (const LargeInt<T>&);
   const LargeInt<T>& operator >> (const LargeInt<T>&);
-  // checks the value of the large int list not considering the signs.
+  //unecessary zeroes in front of the list
+  LargeInt<T>* cleanList()
+  {
+    LinkedList<int>::Iterator i;
+    LinkedList<T> List1 = this->getList();
+    i = List1.firstnode();
+    while (*i == 0 && List1.getLength() != 1)
+    {
+      this->List.deleteFront();
+      ++i;
+    }
+    return this;
+  }
+  //adds one to a largeint
+  LargeInt<T>* addOne()
+  {
+    LargeInt<T>* ret = new LargeInt();
+    LinkedList<int>::Iterator i;
+    //LinkedList<T>List1 = this->getList();
+    i = this->List.lastnode();
+    bool add = false;
+    while (add == false && i != nullptr)
+    {
+      if (*i != 9)
+      {
+        *i = *i + 1;
+        add = true;
+      }
+      ++i;
+    }
+    if (add == false)
+    {
+      this->List.AddFront(1);
+      for (auto i = this->List.firstnode(); i != nullptr; ++i)
+      {
+        if (*i == 9) { *i = 0; }
+      }
+    }
+    return this;
+  }
+  //checks the value of the large int list not considering the signs.
   int Listchecker(const LargeInt<T>& L1, const LargeInt<T>& L2)
   {
     //compares only the digit in L1 and L2 without considering the sign.
@@ -140,7 +180,7 @@ public:
       return 0;
     }
   }
-  // checks the value of of the large ints considering the sign.
+  //checks the value of of the large ints considering the sign.
   int checker(const LargeInt<T>& L1, const LargeInt<T>& L2)
   {
     //L1 compared to L2
@@ -180,6 +220,7 @@ public:
       return 0;
     }
   }
+  //borrows numbers for subtraction
   LinkedList<T> borrow(LinkedList<T>& List1, LinkedList<T>& List2)
   {
     //List 1 must be longer than List2.
@@ -193,18 +234,11 @@ public:
       // go to the left while the number is 0. 
       if (*i1 < *i2)
       {
-        // counter shows how many times we need to move the iterator.
         --i1; counter++;
         while (*i1 <= 0)
         {
           if (i1 != NULL) { --i1; } counter++;
         }
-        //for (int i = 0; i < counter; i++)
-        //{
-        //  *i1 = *i1 - 1;
-        //  ++i1;
-        //  *i1 = *i1 + 10;
-        //}
         while (counter > 0)
         {
           *i1 = *i1 - 1;
@@ -212,16 +246,13 @@ public:
           *i1 = *i1 + 10;
           counter--;
         }
-
-        //*i1 = *i1 - 1;
-        //++i1;
-        //*i1 = *i1 + 10;
       }
       if (i1 != NULL) { --i1; }
       if (i2 != NULL) { --i2; }
     }
     return List1;
   }
+  //adds two large ints
   LargeInt* add(const LargeInt<T>& L1, const LargeInt<T>& L2)
   {
     LargeInt<T>* ret = new LargeInt();
@@ -298,6 +329,7 @@ public:
     ret->setList(List3);
     return ret;
   }
+  //subtracts two large ints
   LargeInt* subtract(const LargeInt<T>& L1, const LargeInt<T>& L2)
   {
     // 348 - 1024 = -676
@@ -343,6 +375,7 @@ public:
     ret->setNegative(L1.negative);
     return ret;
   }
+  //multiplies two large ints
   LargeInt* multiply(const LargeInt<T>& L1, const LargeInt<T>& L2)
   {
     LargeInt<T>* ret = new LargeInt<T>();
@@ -398,16 +431,24 @@ public:
     }
     return ret;
   }
-  // L1 = Numerator
-  // L2 = Denominator
+  //divides two large ints
   LargeInt* divide(const LargeInt<T>& L1, const LargeInt<T>& L2)
   {
-    std::cout << "currently dividing numbers...";
     LargeInt<T>* ret = new LargeInt();
+    if (Listchecker(L1, L2) == -1)
+    {
+      ret->List.AddFront(0);
+      return ret;
+    }
+    if (Listchecker(L1, L2) == 0)
+    {
+      ret->List.AddFront(1);
+      return ret;
+    }    
     LargeInt<T>* temp = new LargeInt();
     LargeInt<T>* temp2 = new LargeInt<T>();
     LargeInt<T>* temp3 = new LargeInt<T>();
-    //LinkedList<T> counter1;
+    //LinkedList<T> counter;
     LinkedList<int>::Iterator i1; LinkedList<int>::Iterator i2;
     LinkedList<T> List1 = L1.getList(); LinkedList<T> List2 = L2.getList();
     temp->setList(List1); temp2->setList(List2); temp3->setList(List2);
@@ -415,7 +456,7 @@ public:
     List2 = temp2->getList();
     i1 = List1.firstnode();
     i2 = List2.firstnode();
-    int counter = 1;
+    int counter = 0;
     std::cout << "\n";
     while (Listchecker(*temp2, *temp) != 1)
     {
@@ -423,14 +464,48 @@ public:
       temp2 = add(*temp2, *temp3);
     }
     List1 = temp2->getList();
-    for (auto i1 = List1.firstnode(); i1 != List1.end(); ++i1)
+    while (counter > 0)
     {
-      std::cout << *i1 << "";
+      ret->List.AddFront(counter%10);
+      counter = counter / 10;
     }
-    std::cout << "\n";
-    std::cout << "Counter: " << counter << "\n";
-    std::cout << "counter: " << counter << std::endl;
     return ret;
+  }
+  //modulate two large ints
+  LargeInt* modulo(const LargeInt<T>& L1, const LargeInt<T>& L2)
+  {
+    //12/5 = 2; quotient
+    //2*5 = 10; product
+    //12-10;
+    // return 2;
+    LargeInt<T>* zero = new LargeInt(); zero->List.AddFront(0);
+    LargeInt<T>* ret = new LargeInt();
+    //LargeInt<T>* temp = new LargeInt();
+    LargeInt<T>* left = new LargeInt(); left->setList(L1.getList());
+    LargeInt<T>* right = new LargeInt(); right->setList(L2.getList());
+      
+        //12%2452 || -12%2452
+    if (L1.negative == L2.negative)
+    {
+      if (Listchecker(L1, L2) == 1)
+      {
+        ret = divide(L1, L2); const LargeInt<T> quotient = *ret;
+        ret = multiply(quotient, L2); const LargeInt<T> product = *ret;
+        ret = subtract(L1, product); const LargeInt<T> difference = *ret;
+      }
+      else
+      {
+        ret->setList(L1.getList());
+      }
+      ret->cleanList(); return ret;
+    }
+    else
+    {
+      ret = divide(L1, L2); ret->addOne(); const LargeInt<T> quotient = *ret;
+      ret = multiply(quotient, L2); const LargeInt<T> product = *ret;
+      ret = subtract(L1, product); const LargeInt<T> difference = *ret;
+    }
+    ret->cleanList(); return ret;
   }
   const LargeInt<T>& operator - (const LargeInt& other)
   {
@@ -607,7 +682,34 @@ public:
       return *this;
     }
   }
-  const LargeInt<T>& operator % (const LargeInt& other);
+  const LargeInt<T>& operator % (const LargeInt& other)
+  {
+    LargeInt<T>* ret = new LargeInt<T>();
+    if (this->getNegative() == other.negative)
+    {
+      ret = modulo(*this, other);
+      List = ret->getList();
+      negative = this->getNegative();
+      return *this;
+    }
+    else
+    {
+      if (this->getNegative() == true)
+      {
+        ret = modulo(*this, other);
+        List = ret->getList();
+        negative = false;
+        return *this;
+      }
+      else
+      {
+        ret = modulo(*this, other);
+        List = ret->getList();
+        negative = true;
+        return *this;
+      }
+    }
+  }
 };
 
 #endif
